@@ -1,9 +1,9 @@
 #ifndef SPIELFELD_HEADER
 #define SPIELFELD_HEADER
 struct SpielFeld {
-    unsigned int w, h;
+    unsigned int breite, hoehe;
     unsigned int einstieg_x, einstieg_y;
-    unsigned int *buffer;
+    unsigned int *terrain_buffer;
 };
 
 struct SpielFeld *lade_spielfeld (char *dateiname);

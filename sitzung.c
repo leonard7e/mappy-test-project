@@ -36,7 +36,7 @@ bool begehbar(unsigned int z) {
 }
 
 bool feld_begehbar(struct Sitzung *s, unsigned int px, unsigned int py) {
-    unsigned int *b = s->sfeld->buffer;
+    unsigned int *b = s->sfeld->terrain_buffer;
     unsigned int p = s->sfeld->w * py + px;
     return begehbar(*(b + p));
 }
@@ -63,7 +63,7 @@ void feldcode_drucken(unsigned int z) {
 
 void sitzung_drucken (struct Sitzung *sitzung) {
     struct SpielFeld *sfeld = sitzung->sfeld;
-    unsigned int *feldeintrag = sfeld->buffer;
+    unsigned int *feldeintrag = sfeld->terrain_buffer;
 
     //
     for(int y=0; y<sfeld->h; y++) {

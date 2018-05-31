@@ -2,10 +2,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//
-struct SpielFeld *lade_spielfeld (char *dateiname) {
-    // Wir öffnen die Datei, die das Spielfeld beinhalten soll
-    FILE *felddatei;
+/*
+    Ein Spielfeld besteht aus einem Zeiger auf ein Terrain-terrain_buffer, einem Einstiegspunkt für den Spieler, und Informationen über Breite und Höhe des Terrain-Buffers.
+    Spielfelder lassen sich lesen. Die Funktion, die dies für uns erledigt, ist lade_spielfeld. Mit lade_spielfeld wird ein Speicherbereich für ein Spielfeld und ein Terrain-Buffer alloziert. Nach der Benutzung des Spielfeldes müssen wir daher den Speicher wieder freigeben, um Memory-Leaks zu vermeiden. Das erledigt die Funktion loesche_spielfeld.
+*/
+
+struct SpielFeld *lade_spielfeld (
+    char *dateiname // Name der Datei, aus der das Spielfeld geladen werden soll
+) {
+    /*
+        Eine Spielfeld-Datei ist eine Textdatei, die aus drei Abschnitten besteht.
+            Spielfeld <breite> <hoehe>
+            Spieler <einstieg_x> <einstieg_y>
+            <das Terrain>
+        Beim Lesen der Datei lesen wir alle drei Abschnitte nacheinander.
+
+        Am Anfang versuchen wir, die Datei im lese-Modus zu öffnen. Der File-Descriptor der Datei wird in
+    */
+    FILE *felddatei
+    /*
+        festgehalten.
+    */
     felddatei = fopen(dateiname, "r");
 
     if (felddatei == NULL) {
@@ -13,30 +30,51 @@ struct SpielFeld *lade_spielfeld (char *dateiname) {
         exit(EXIT_FAILURE);
     }
 
-    // Nun können wir den Inhalt der Datei lesen.
-    size_t line_length = 0;
-    ssize_t read_length = 0;
-    char *line_string = NULL;
+    /*
+        Das Lesen der Spielfeld-Datei geschieht Zeilenweise. Das Ende jeder Zeile wird von einem Zeilenumbruch festgelegt.
+    */
+    char *line_string = NULL; // Gelesene Zeile, als String
+    size_t line_length = 0; // Länge der gelesenen Zeile
+    ssize_t read_length = 0; // Zum ermitteln, ob das Ende der Datei erreicht wurde.
 
-    // Die ersten beiden Zeilen werden gelesen.
+    /*
+        Die erste Zeile beinhaltet den Abschnitt:
+            Spielfeld <breite> <hoehe>
+    */
     getline(&line_string, &line_length, felddatei);
-    uint w=0;
-    uint h=0;
-    sscanf(line_string, "SpielFeld %d %d", &w, &h );
+    uint breite=0;
+    uint hoehe=0;
+    sscanf(line_string, "SpielFeld %d %d", &breite, &hoehe );
 
+    /*
+        Der nächste Abschnitt wäre:
+            Spieler <einstieg_x> <einstieg_y>
+    */
     getline(&line_string, &line_length, felddatei);
     uint p_x=0;
     uint p_y=0;
     sscanf(line_string, "Spieler %d %d", &p_x, &p_y );
 
-    // Inhalt des Spielfelds wird geladen
-    unsigned int *buffer = malloc(w*h*sizeof(uint));
-    unsigned int *bcursor = buffer;
+    /*
+        Zum letzten Abschnitt. Der Inhalt des Terrain-Buffers wird geladen.
 
+        Die Addresse des Terrain-Buffers wird durch */
+    unsigned int *terrain_buffer = malloc(breite*hoehe*sizeof(uint));
+    /*
+        festgehalten. Beim Zugreifen und Verändern des Terrain-Buffers wird die Variable terrain_buffer allerdings nicht verändert. Für Veränderungen am Buffer führen wir die Variable bcursor ein.
+    */
+    unsigned int *bcursor = terrain_buffer;
+
+    /*
+        Wir sind soweit, daß wir den Terrain-Buffer lesen können. Wie oben beschrieben, tun wir dies Zeile für Zeile.
+    */
     while ((read_length = getline(&line_string, &line_length, felddatei)) != -1) {
+        /*
+            Die gelesene Zeile, welche in line_string festgehalten wird, wird in der nächsten Schleife in ihre einzelnen Felder zerlegt.
+        */
         for (int i=0; i<read_length-1; i+=1) {
             *bcursor = line_string[i];
-            bcursor ++;
+            bcursor ++; // Den bcursor um ein Feld verschieben.
         }
     }
 
@@ -44,19 +82,22 @@ struct SpielFeld *lade_spielfeld (char *dateiname) {
     bcursor = NULL;
     free(line_string);
 
-    // Das Spielfeld kann zusammengesetzt werden.
+    /*
+        Nun haben wir alles, was wir für die Zusammensetzung der Struktur SpielFeld brauchen. Wir können sie zusammengeseten.
+    */
     struct SpielFeld *newmap = malloc(sizeof(struct SpielFeld));
-    newmap->w = w;
-    newmap->h = h;
+    newmap->breite = breite;
+    newmap->hoehe = hoehe;
     newmap->einstieg_x = p_x;
     newmap->einstieg_y = p_y;
-    newmap->buffer = buffer;
+    newmap->terrain_buffer = terrain_buffer;
     return newmap;
 }
 
-
-
+/*
+    Befreien des Speicherbereichs, der durch lade_spielfeld alloziert wurde.
+*/
 void loesche_spielfeld (struct SpielFeld *sfeld) {
-    free(sfeld->buffer);
+    free(sfeld->terrain_buffer);
     free(sfeld);
 }
