@@ -5,6 +5,8 @@
 /*
     Ein Spielfeld besteht aus einem Zeiger auf ein Terrain-terrain_buffer, einem Einstiegspunkt für den Spieler, und Informationen über Breite und Höhe des Terrain-Buffers.
     Spielfelder lassen sich lesen. Die Funktion, die dies für uns erledigt, ist lade_spielfeld. Mit lade_spielfeld wird ein Speicherbereich für ein Spielfeld und ein Terrain-Buffer alloziert. Nach der Benutzung des Spielfeldes müssen wir daher den Speicher wieder freigeben, um Memory-Leaks zu vermeiden. Das erledigt die Funktion loesche_spielfeld.
+
+    Der Endbenutzer sollte mit der SpielFeld-Struktur keinen direkten Zugriff haben. Indirekt wird diese Struktur über die Struktur 'Sitzung' verwaltet und benutzt.
 */
 
 struct SpielFeld *lade_spielfeld (
@@ -19,7 +21,7 @@ struct SpielFeld *lade_spielfeld (
 
         Am Anfang versuchen wir, die Datei im lese-Modus zu öffnen. Der File-Descriptor der Datei wird in
     */
-    FILE *felddatei
+    FILE *felddatei;
     /*
         festgehalten.
     */
