@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <curses.h>
 
 #include "sitzung.h"
 #include "spielfeld.h"
@@ -16,6 +17,9 @@ struct Sitzung *neue_sitzung(char *spielfeld_name) {
     sitzung->sfeld = lade_spielfeld(spielfeld_name);
     sitzung->pos_x = sitzung->sfeld->einstieg_x;
     sitzung->pos_y = sitzung->sfeld->einstieg_y;
+
+    // Curses einrichten.
+    clear();
     return sitzung;
 }
 
@@ -109,11 +113,11 @@ void bewege_schritt (struct Sitzung *s, enum Richtung r) {
 */
 
 
-void feldcode_drucken(unsigned int z) {
+void feldcode_drucken(unsigned int z, int y, int x) {
     /*
         Das Terrain von jenem Feldcode auf dem Bildschirm anzeigen. In diesem Fall ist es einfach die Variable 'z' als Charakter, wie er im Commandline-Interface der Console zu sehen ist.
     */
-    putchar(z);
+    mvaddch(y,x,z);
 }
 
 
@@ -128,12 +132,15 @@ void sitzung_drucken (struct Sitzung *sitzung) {
     for(int y=0; y<sfeld->hoehe; y++) {
         for(int x=0; x<sfeld->breite; x++) {
             if (x == sitzung->pos_x && y == sitzung->pos_y){
-                putchar('O');
+                mvaddch(y,x,'O');
             } else {
-                feldcode_drucken(*feldeintrag);
+                feldcode_drucken(*feldeintrag, y, x);
             }
             feldeintrag ++;
         }
         printf("\n");
     }
+
+    // NCurses bescheid geben, daß eine Änderung gerendert werden soll.
+    refresh();
 }
