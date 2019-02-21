@@ -21,15 +21,19 @@ int main(int argc, char const *argv[]) {
     struct Sitzung *sitzung = neue_sitzung("ein_spielfeld.txt");
     // struct SpielFeld *sfeld = lade_spielfeld("test.txt");
 
+    getch();
     sitzung_drucken(sitzung);
-    bewege_schritt(sitzung, Rauf);
+    bewege_schritt(sitzung, Runter);
 
     getch();
-
     sitzung_drucken(sitzung);
+    bewege_schritt(sitzung, Runter);
 
     getch();
+    sitzung_drucken(sitzung);
+    bewege_schritt(sitzung, Rechts);
 
+    getch();
     beende_sitzung(sitzung);
     end_game();
     return 0;

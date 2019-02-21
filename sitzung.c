@@ -93,6 +93,23 @@ bool feld_begehbar(struct Sitzung *s, unsigned int px, unsigned int py) {
     Ist das Terrain des Feldes in der gewünschten Richtung begehbar, wird die Position des Spielers innerhalb der Sitzung angepasst. Ist jenes Terrain unbegehbar, wird eine entsprechende Meldung angezeigt.
 */
 
+
+
+enum Nachricht {
+    VorDieWandGerannt
+};
+
+void nachricht_senden( uint n ) {
+    switch (n) {
+        case (VorDieWandGerannt):
+            mvaddstr(LINES - 1, 0, "Hoppla! Du bist vor die Wand gerannt. Passiert jedem mal.");
+            break;
+        // default:
+            // mache nichts.
+    }
+
+}
+
 void bewege_schritt (struct Sitzung *s, enum Richtung r) {
     int dx, dy;
     richtungsvektor(r, &dx, &dy);
@@ -104,7 +121,7 @@ void bewege_schritt (struct Sitzung *s, enum Richtung r) {
         s->pos_x = p_x;
         s->pos_y = p_y;
     } else {
-        printf( "Hoppla!\nDu bist vor die Wand gerannt. Passiert jedem mal.\n");
+        nachricht_senden(VorDieWandGerannt);
     }
 }
 
@@ -138,7 +155,6 @@ void sitzung_drucken (struct Sitzung *sitzung) {
             }
             feldeintrag ++;
         }
-        printf("\n");
     }
 
     // NCurses bescheid geben, daß eine Änderung gerendert werden soll.
