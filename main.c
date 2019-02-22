@@ -53,10 +53,9 @@ int main(int argc, char const *argv[]) {
     begin_game();
 
     struct Sitzung *sitzung = neue_sitzung("ein_spielfeld.txt");
-    // struct SpielFeld *sfeld = lade_spielfeld("test.txt");
-
     eingabe_schleife(sitzung);
     beende_sitzung(sitzung);
+
     end_game();
     return 0;
 }
