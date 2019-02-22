@@ -139,6 +139,8 @@ void feldcode_drucken(unsigned int z, int y, int x) {
 
 
 void sitzung_drucken (struct Sitzung *sitzung) {
+    // Das Spielfeld säubern.
+    clear();
     /*
         Die Sitzung visualisieren.
     */
